@@ -11,4 +11,8 @@
 2.对于形似函数的宏，最好改用inline函数体寒#define（宏的问题，实参小括号严格，前置递增敏感）
 
 条款3： 尽可能使用const
-降低不正当操作的错误
+#降低不正当操作的错误
+#常函数() cosnt，不能修改成员的值，除非成员设置为 mutable(可变的)
+#non-const版本 调用 const版本(可以避免代码重复)避免递归调用自己，二次转型
+static_cast<const T&>(*this) 安全转型，非常量转成常量，增加const
+const_cast<char&>(...) 移除const
