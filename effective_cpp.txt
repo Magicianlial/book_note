@@ -42,3 +42,6 @@ const_cast<char&>(...) 移除const
 深拷贝：如果在复制这个对象的时候为新对象制作了外部对象的独立复制，就是深拷贝。
 
 #编译器可以暗自为class创建default构造函数，copy构造函数,copy assignment操作符,以及析构函数
+
+条款6：若不想使用编译器自动生成的函数，就该明确拒绝
+为驳回编译器自动提供的机能（拷贝构造函数，赋值函数等），可将相应的成员函数声明为private并不予实现。或者使用Uncopyable这样的base class（protected 构造和析构函数， private拷贝和赋值）
