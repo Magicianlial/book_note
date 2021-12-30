@@ -95,3 +95,8 @@ virtual void funtion()=0）
 1.为防止资源泄露，请使用RAII对象，它们在构造函数中获得资源并在析构函数中释放资源
 2.两个常用的RAII classes分别是shared_ptr和auto_ptr(在cpp11中已经被unique_ptr取代）
 #cpp11三种智能指针shared_ptr（计数，可指向同一）,unique_ptr（唯一对应）和weak_ptr（更像是shared_ptr的一个助手，不增加计数不具有普通指针的行为*和->，重要用途是获得this指针的shared_ptr，解决循环引用）
+
+条款14：在资源管理类中小心coping行为
+#explic(显式的，不允许隐式转换，隐式转换发生在从小->大的转换中)
+1.复制RAII对象必须一并复制它所管理的资源（如果不这样，会出现A,B指向同一个底层对象，A删除后B访问错误），所以资源的copying行为决定RAII对象的copying行为。
+2.普遍而常见的RAII class copying 行为是： 抑制copying、施行引用计数法（reference counting）。不过其他行为也都可能被实现。
