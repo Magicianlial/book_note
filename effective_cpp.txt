@@ -442,6 +442,32 @@ non-virtual interface(NVI)，以public non-virtual成员函数包裹较低访问
 1.针对非类型模板参数，以函数参数或成员变量替换template参数
 2.针对类型参数，用带有完全相同二进制表述的具现类型共享实现码（vector<int> vector<long>，有相同的二进制表述，唯一一份底层实现）
 
+---------------------------------------------------------
+条款45：运用成员函数模板接受所有兼容类型
+
+#我们想获得继承类和基类之间转换的能力，可以根据现有的类再构造一个派生类并写一个接受基类参数的构造函数，但是之后我们为这个继承体系扩展的时候，这些派生类又要写一大堆新的构造函数。
+
+似乎我们需要的不是为className写一个构造函数，而是为它写一个构造模板，这样的模板是所谓member function templates，其作用是为了class生成函数：
+template<typename T>
+class className {
+public:
+    template<typename U>
+    className(const className<U> &other);//生成copy构造函数
+    ...
+};
+
+以上代码的意思是，对任何类型T和任何类型U，这里可以根据className<U>生成一个ClassName<T>，因为ClassName<T>有个构造函数接受ClassName<U>参数。这一类构造函数根据对象 u创建对象t，而u和v的类型是同一个template的不同具现体，有时我们称之为泛化copy构造函数。
+然而我们并不希望低层的derived class能转换为高层的derived class，也不希望能够用className<double>创建一个className<int>，因此我们必须从某方面对这一member template所创建的成员函数群进行拣选或筛除。
+
+我们使用成员初始化表来初始化T*成员变量，并以类型为U*的指针作为初值，这个行为只有当“存在某个隐式转换可将一个U*指针转为一个T*指针”时才能通过编译，那正是我们想要的。
+
+
+1.成员模板函数可以生成“接受所有兼容类型”函数
+2.用成员模板做“泛化copy构造”或“泛化赋值操作”，还是需要声明正常的copy和=
+
+
+
+
 
 
 
