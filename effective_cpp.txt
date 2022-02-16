@@ -490,5 +490,18 @@ public:
 ---------------------------------------------------------
 八、定制new和delete
 
+条款49：了解new-handler的行为
+
+#新一代new（运算符）无法（自由存储区）分配足够内存会抛出bad_alloc异常（老一代返回null）
+
+#在抛出异常前，它会先调用一个客户指定的错误处理函数，一个所谓的new-handler。
+new_handler是一个指向函数的指针，该函数没有返回值和参数。set_new_handler是一个获得一个new_handler并返回一个new_handler的函数，其参数是一个指针，指向operator new无法分配足够内存时该被调用的函数，其返回值指向set_new_handler 被调用前正在执行（马上要被替换 ）的那个new_handler函数。
+
+
+
+
+
+
+
 
 
