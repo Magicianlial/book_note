@@ -233,7 +233,6 @@ void work() {
 
             int bn = workband[i].size();
             //存储日志
-            
             unordered_map<string, int> curlog; //(server, get)从边缘获得多少流量
            /* while (need) {
                 int idx = rand() % bn;
@@ -244,9 +243,19 @@ void work() {
                 bd[idx] -= k;
             }*/
 
-           
-            
+            int avg_need = need / bn;
             for (int j = 0; j < bn; ++j) {
+                int idx = workband[i][j];
+                if (bd[idx] == 0) continue;
+                int k = min(avg_need, bd[idx]);
+                need -= k;
+                bd[idx] -= k;
+                //s += "<" + server[idx] + "," + to_string(k) + ">,";
+                curlog[server[idx]] += k;
+                if (need == 0) break;
+            }
+            
+            for (int j = 0; need && j < bn; ++j) {
                 int idx = workband[i][j];
                 if (bd[idx] == 0) continue;
                 int k = min(need, bd[idx]);
