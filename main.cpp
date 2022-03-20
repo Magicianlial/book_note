@@ -180,10 +180,11 @@ void work() {
 
     ofstream out("/output/solution.txt");
 
+    //哈希表：名字和索引对应
     for (int i = 0; i < cntClient; ++i) client_idx[client[i]] = i;
     for (int i = 0; i < cntServer; ++i) server_idx[server[i]] = i;
 
-    vector<int> serverHas(cntServer, 0);
+    vector<int> serverHas(cntServer, 0); //服务器能连接的用户数量
 
     //预处理有效节点
     for (int i = 0; i < cntClient; ++i) {
@@ -215,12 +216,15 @@ void work() {
 
     //处理
     int idxLine = 0, maxLine = cntTime * cntClient - 1;
-    for (int t = 0; t < cntTime; ++t) {
+    for (int t = 0; t < cntTime; ++t) { //时间
         vector<int> bd = tserver;
 
-        for (int k = 0; k < cntClient; ++k) {
+        //存储日志组
+        vector<unordered_map<string, int>> curlog(cntClient); //用户i(server, get)从边缘获得多少流量
 
-            int i = sortedClient[k].second;
+        for (int k = 0; k < cntClient; ++k) { //用户
+
+            int i = sortedClient[k].second; //用户序号
 
             string s = client[i] + ":";
             int need = tclient[t][i]; //所需流量
@@ -231,18 +235,8 @@ void work() {
                 continue;
             }
 
-            int bn = workband[i].size();
+            int bn = workband[i].size(); //连接服务器数量
             //存储日志
-            unordered_map<string, int> curlog; //(server, get)从边缘获得多少流量
-           /* while (need) {
-                int idx = rand() % bn;
-                if (bd[idx] == 0) continue;
-                int k = min(need, bd[idx]);
-                curlog[server[idx]] += k;
-                need -= k;
-                bd[idx] -= k;
-            }*/
-
             int avg_need = need / bn;
             for (int j = 0; j < bn; ++j) {
                 int idx = workband[i][j];
@@ -251,10 +245,10 @@ void work() {
                 need -= k;
                 bd[idx] -= k;
                 //s += "<" + server[idx] + "," + to_string(k) + ">,";
-                curlog[server[idx]] += k;
+                curlog[i][server[idx]] += k;
                 if (need == 0) break;
             }
-            
+
             for (int j = 0; need && j < bn; ++j) {
                 int idx = workband[i][j];
                 if (bd[idx] == 0) continue;
@@ -262,13 +256,17 @@ void work() {
                 need -= k;
                 bd[idx] -= k;
                 //s += "<" + server[idx] + "," + to_string(k) + ">,";
-                curlog[server[idx]] += k;
+                curlog[i][server[idx]] += k;
                 if (need == 0) break;
             }
-            //while (need) cout << 1; //若有剩余未分配 ->超时错误
+                
+            
+        }
 
-             //拼接日志
-            for (auto& it : curlog) {
+        //拼接日志
+        for (int ci = 0; ci < cntClient; ++ci) {
+            string s = client[ci] + ":";
+            for (auto& it : curlog[ci]) {
                 s += "<" + it.first + "," + to_string(it.second) + ">,";
             }
 
@@ -282,28 +280,7 @@ void work() {
     out.close();
 }
 
-////格式判断
-//bool isFormat(string& res, vector<int>& bd) {
-//    for(char &c : res) if(c == ':' || c == ',')
-//    cout << "格式错误" << endl;
-//    system("pause");
-//}
-//
-////判断输出是否合法
-//void check() {
-//    fstream data("/output/solution.txt");
-//    string line;
-//    for(int i = 0; i < cntTime; ++i) {
-//
-//        vector<int> bd = tserver;
-//
-//        for (int j = 0; j < cntClient; ++j) {
-//            getline(data, line);
-//            cout << data << endl;
-//            isFormat(line, bd);
-//        }
-//    }
-//}
+
 
 
 
