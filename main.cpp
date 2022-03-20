@@ -215,7 +215,7 @@ void work() {
         });
 
     //处理
-    int idxLine = 0, maxLine = cntTime * cntClient - 1;
+    /*int idxLine = 0, maxLine = cntTime * cntClient - 1;*/
     for (int t = 0; t < cntTime; ++t) { //时间
         vector<int> bd = tserver;
 
@@ -230,8 +230,7 @@ void work() {
             int need = tclient[t][i]; //所需流量
 
             if (!need) {
-                out << s;
-                if(idxLine < maxLine) out << endl;
+                out << s << endl;
                 continue;
             }
 
@@ -265,15 +264,14 @@ void work() {
 
         //拼接日志
         for (int ci = 0; ci < cntClient; ++ci) {
+            if (curlog[ci].empty()) continue;
             string s = client[ci] + ":";
             for (auto& it : curlog[ci]) {
                 s += "<" + it.first + "," + to_string(it.second) + ">,";
             }
 
             s.pop_back();
-            out << s;
-            if (idxLine < maxLine) out << endl;
-            ++idxLine;
+            out << s << endl;
         }
     }
 
