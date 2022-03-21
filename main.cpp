@@ -9,6 +9,7 @@
 
 
 using namespace std;
+using pii = pair<int, int>;
 const int Nt = 9000, Nc = 40, Ns = 200;
 int qos, cntTime, cntClient, cntServer; //最大延迟、总时间、客户数量、服务器数量
 vector<string> client(Nc), server(Ns), timeLog(Nt); //客户名称、服务器名称、时间戳
@@ -196,10 +197,10 @@ void work() {
         }
     }
 
-    //按边缘节点连接用户数量排序
+    //按边缘节点容量排序
     for (int i = 0; i < cntClient; ++i) {
         sort(workband[i].begin(), workband[i].end(), [&](int a, int b) {
-            return serverHas[a] < serverHas[b];
+            return tserver[a] > tserver[b];
         });
     }
 
@@ -222,6 +223,8 @@ void work() {
         //存储日志组
         vector<unordered_map<string, int>> curlog(cntClient); //用户i(server, get)从边缘获得多少流量
 
+        
+
         for (int k = 0; k < cntClient; ++k) { //用户
 
             int i = sortedClient[k].second; //用户序号
@@ -234,30 +237,51 @@ void work() {
                 continue;
             }
 
-            int bn = workband[i].size(); //连接服务器数量
-            //存储日志
-            int avg_need = need / bn;
-            for (int j = 0; j < bn; ++j) {
-                int idx = workband[i][j];
-                if (bd[idx] == 0) continue;
-                int k = min(avg_need, bd[idx]);
-                need -= k;
-                bd[idx] -= k;
-                //s += "<" + server[idx] + "," + to_string(k) + ">,";
-                curlog[i][server[idx]] += k;
-                if (need == 0) break;
+            //int bn = workband[i].size(); //连接服务器数量
+
+            //存储优先队列
+            priority_queue<pii> lake;
+            int lenbd = bd.size();
+            for (int j = 0; j < workband[i].size(); ++j) {
+                int sidx = workband[i][j];
+                if (bd[sidx] == 0) continue;
+                lake.push({ bd[sidx], sidx });
             }
 
-            for (int j = 0; need && j < bn; ++j) {
-                int idx = workband[i][j];
-                if (bd[idx] == 0) continue;
-                int k = min(need, bd[idx]);
+            while (need) {
+                auto cur = lake.top();
+                int store = cur.first, seridx = cur.second;
+                lake.pop();
+                int k = min(need, store / serverHas[seridx]);
                 need -= k;
-                bd[idx] -= k;
-                //s += "<" + server[idx] + "," + to_string(k) + ">,";
-                curlog[i][server[idx]] += k;
-                if (need == 0) break;
+                store -= k;
+                bd[seridx] -= k;
+                curlog[i][server[seridx]] += k;
+                if (store) lake.push({ store, seridx });
             }
+
+            //int avg_need = need / bn;
+            //for (int j = 0; j < bn; ++j) {
+            //    int idx = workband[i][j];
+            //    if (bd[idx] == 0) continue;
+            //    int k = min(avg_need, bd[idx]);
+            //    need -= k;
+            //    bd[idx] -= k;
+            //    //s += "<" + server[idx] + "," + to_string(k) + ">,";
+            //    curlog[i][server[idx]] += k;
+            //    if (need == 0) break;
+            //}
+
+            //for (int j = 0; need && j < bn; ++j) {
+            //    int idx = workband[i][j];
+            //    if (bd[idx] == 0) continue;
+            //    int k = min(need, bd[idx]);
+            //    need -= k;
+            //    bd[idx] -= k;
+            //    //s += "<" + server[idx] + "," + to_string(k) + ">,";
+            //    curlog[i][server[idx]] += k;
+            //    if (need == 0) break;
+            //}
                 
             
         }
