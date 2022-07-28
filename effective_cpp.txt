@@ -263,7 +263,7 @@ string A(B); （直接用拷贝构造函数）
 旧式转型： T(a)   (T)a
 新式转型：
 1.const_cast 消除常量性
-2.static_cast 隐式转换（例如int -> double，空指针 -> 某一类型指针）
+2.static_cast 强制转换（例如int -> double，空指针 -> 某一类型指针）
 3.dynamic_cast 继承体系，“安全向下转型”，旧式无法做到
 4.reinterpret_cast 低级转型，指针到int
 
